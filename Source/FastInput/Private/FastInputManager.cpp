@@ -26,6 +26,7 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow !WidgetPtr->GetTypeAsString().Equals(\"SEditableText\")"));
 		return;
 	}
+	EditableTextSharedPtr.Reset();
 	EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 	int depth = 20;
 	TSharedPtr<SWidget> TempWidgetSharedPtr;
@@ -56,7 +57,7 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 
 	TArray<TSharedPtr<IPropertyHandle>> PropertyHandlePtrArray = InDetailSingleItemRowPtr->GetPropertyHandles();
 
-	for (auto& PropertyHandlePtr : PropertyHandlePtrArray) {
+	/*for (auto& PropertyHandlePtr : PropertyHandlePtrArray) {
 		FProperty* Property = PropertyHandlePtr->GetProperty();
 		auto PropertyName = Property->GetName();
 		auto PropertyNameCPP = Property->GetNameCPP();
@@ -86,21 +87,18 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 			);
 		}
 
-	}
+	}*/
 
 	if (PropertyHandlePtrArray.Num()) {
 		TSharedPtr<IPropertyHandle> PropertyHandlePtr = PropertyHandlePtrArray[0];
 		FProperty* Property = PropertyHandlePtr->GetProperty();
-		FString PropertyName = Property->GetName();
-		FString PropertyOwnerClassName("");
-		FString PropertyOwnerStructName("");
-		FString SelectActorClassName("");
+		PropertyName = Property->GetName();
 		UClass* PropertyOwnerClass = Property->GetOwnerClass();
 		if (PropertyOwnerClass) PropertyOwnerClassName = PropertyOwnerClass->GetName();
 		UStruct* PropertyOwnerStruct = Property->GetOwnerStruct();
 		if (PropertyOwnerClass) PropertyOwnerStructName = PropertyOwnerStruct->GetName();
 		UClass* SelectActorClass = GetSelectedActorClass();
-		if (PropertyOwnerClass) SelectActorClassName = SelectActorClass->GetName();
+		if (PropertyOwnerClass) PropertyActorClassName = SelectActorClass->GetName();
 	}
 }
 
@@ -166,29 +164,28 @@ TArray<FString> UFastInputManager::GetAllPropertyNames(UClass* InClass)
 	for (TFieldIterator<FProperty> PropertyIterator(InClass); PropertyIterator; ++PropertyIterator)
 	{
 		FProperty* Property = *PropertyIterator;
-		FString PropertyName = Property->GetName();
-		PropertyNamesArray.Add(PropertyName);
+		PropertyNamesArray.Add(Property->GetName());
 	}
 	return PropertyNamesArray;
 }
 
-FString UFastInputManager::FIGetJsonPath(FString PropertyName, UClass* Class, UStruct* Struct)
+FString UFastInputManager::FIGetJsonPath(FString InPropertyName, UClass* InClass, UStruct* InStruct)
 {
 	FString FilePath(FPaths::ProjectContentDir() + "FastInput/");
-	FString FileName(PropertyName + " ");
-	if (Class) {
-		FileName += Class->GetName() + ".json";
+	FString FileName(InPropertyName + " ");
+	if (InClass) {
+		FileName += InClass->GetName() + ".json";
 	}
-	if (Struct) {
-		FileName += Struct->GetName() + ".json";
+	if (InStruct) {
+		FileName += InStruct->GetName() + ".json";
 	}
 	return FilePath + FileName;
 }
 
-TArray<FString> UFastInputManager::GetAllSelections(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass)
+TArray<FString> UFastInputManager::GetAllSelections(FString InPropertyName, UClass* InClass, UStruct* InStruct, UClass* ObjectClass)
 {
 	TArray<FString> SelectionsArray;
-	TSharedPtr<FJsonObject> PropertyFastInputJsonSPtr = FIReadJson(FIGetJsonPath(PropertyName, Class, Struct));
+	TSharedPtr<FJsonObject> PropertyFastInputJsonSPtr = FIReadJson(FIGetJsonPath(InPropertyName, InClass, InStruct));
 	if (!PropertyFastInputJsonSPtr) return SelectionsArray;
 	FString DTRef = PropertyFastInputJsonSPtr->GetStringField("DTRef");
 	UDataTable* DT = nullptr;
@@ -238,9 +235,9 @@ TSharedPtr<FJsonObject> UFastInputManager::FIMakeJson(UDataTable* DT)
 	return JsonObject;
 }
 
-bool UFastInputManager::FISaveJson(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass, UDataTable* DT)
+bool UFastInputManager::FISaveJson(FString InPropertyName, UClass* InClass, UStruct* InStruct, UClass* ObjectClass, UDataTable* DT)
 {
-	FString FilePath = FIGetJsonPath(PropertyName, Class, Struct);
+	FString FilePath = FIGetJsonPath(InPropertyName, InClass, InStruct);
 	TSharedPtr<FJsonObject> JsonObject = FIMakeJson(DT);
 
 	if (JsonObject.IsValid())

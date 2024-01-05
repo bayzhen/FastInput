@@ -52,4 +52,12 @@ public:
 public:
 	static UFastInputManager* self;
 	TSharedPtr<SEditableText> EditableTextSharedPtr;
+	UPROPERTY(EditAnywhere)
+	FString PropertyName;
+	UPROPERTY(EditAnywhere)
+	FString PropertyOwnerClassName;
+	UPROPERTY(EditAnywhere)
+	FString PropertyOwnerStructName;
+	UPROPERTY(EditAnywhere)
+	FString PropertyActorClassName;
 };
