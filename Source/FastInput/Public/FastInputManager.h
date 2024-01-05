@@ -10,8 +10,6 @@
 #include "Selection.h"
 #include "FastInputManager.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnFastInputDetect, FString, PropertyName, UClass*, PropertyOwnerClass, UStruct*, PropertyOwnerStruct, UClass*, ObjectClass);
-
 UCLASS()
 class FASTINPUT_API UFastInputManager : public UObject
 {
@@ -23,27 +21,27 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static UFastInputManager* Get();
 
-	// 有关鼠标点击
 public:
+	// 有关鼠标点击
 	void GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSharedPtr<SDetailSingleItemRow>& OutDetailSingleItemRow);
 	void GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleItemRow>& InDetailSingleItemRowPtr);
 
-	// 有关FI界面提供函数
 public:
+	// 有关FI界面提供函数
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAllPropertyNames(UClass* InClass);
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAllSelections(FString PropertyName, UClass* PropertyOwnerClass, UStruct* PropertyOwnerStruct, UClass* ObjectClass);
 	UFUNCTION(BlueprintCallable)
-	UClass* GetSelectedActorClass();
+	static UClass* GetSelectedActorClass();
 	UFUNCTION(BlueprintCallable)
 	void SetEditableText(FString InputString);
 	UFUNCTION(BlueprintCallable)
-	FString GetUClassName(UClass* PropertyOwnerClass);
+	static FString GetUClassName(UClass* PropertyOwnerClass);
 	UFUNCTION(BlueprintCallable)
-	FString GetUStructName(UStruct* PropertyOwnerStruct);
-	// 有关Json
+	static FString GetUStructName(UStruct* PropertyOwnerStruct);
 public:
+	// 有关Json
 	UFUNCTION(BlueprintCallable)
 	FString FIGetJsonPath(FString PropertyName, UClass* Class, UStruct* Struct);
 	TSharedPtr<FJsonObject> FIReadJson(const FString& FilePath);
@@ -52,10 +50,6 @@ public:
 	bool FISaveJson(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass, UDataTable* DT);
 
 public:
-	UPROPERTY(BlueprintAssignable)
-	FOnFastInputDetect OnFastInputDetect;
-
-public:
 	static UFastInputManager* self;
-	SEditableText* EditableText;
+	TSharedPtr<SEditableText> EditableTextSharedPtr;
 };

@@ -26,8 +26,7 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow !WidgetPtr->GetTypeAsString().Equals(\"SEditableText\")"));
 		return;
 	}
-	TSharedPtr<SEditableText> EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
-	EditableText = EditableTextSharedPtr.Get();
+	EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 	int depth = 20;
 	TSharedPtr<SWidget> TempWidgetSharedPtr;
 
@@ -93,10 +92,15 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		TSharedPtr<IPropertyHandle> PropertyHandlePtr = PropertyHandlePtrArray[0];
 		FProperty* Property = PropertyHandlePtr->GetProperty();
 		FString PropertyName = Property->GetName();
+		FString PropertyOwnerClassName("");
+		FString PropertyOwnerStructName("");
+		FString SelectActorClassName("");
 		UClass* PropertyOwnerClass = Property->GetOwnerClass();
+		if (PropertyOwnerClass) PropertyOwnerClassName = PropertyOwnerClass->GetName();
 		UStruct* PropertyOwnerStruct = Property->GetOwnerStruct();
+		if (PropertyOwnerClass) PropertyOwnerStructName = PropertyOwnerStruct->GetName();
 		UClass* SelectActorClass = GetSelectedActorClass();
-		OnFastInputDetect.Broadcast(PropertyName, PropertyOwnerClass, PropertyOwnerStruct, SelectActorClass);
+		if (PropertyOwnerClass) SelectActorClassName = SelectActorClass->GetName();
 	}
 }
 
@@ -129,7 +133,9 @@ UClass* UFastInputManager::GetSelectedActorClass()
 
 void UFastInputManager::SetEditableText(FString InputString)
 {
-
+	if (EditableTextSharedPtr.IsValid()) {
+		EditableTextSharedPtr->SetText(FText::FromString(InputString));
+	}
 }
 
 FString UFastInputManager::GetUClassName(UClass* PropertyOwnerClass)
