@@ -128,7 +128,23 @@ UClass* UFastInputManager::GetSelectedActorClass()
 
 void UFastInputManager::SetEditableText(FString InputString)
 {
-	
+
+}
+
+FString UFastInputManager::GetUClassName(UClass* PropertyOwnerClass)
+{
+	FString Name("");
+	if (PropertyOwnerClass)
+		return PropertyOwnerClass->GetName();
+	return Name;
+}
+
+FString UFastInputManager::GetUStructName(UStruct* PropertyOwnerStruct)
+{
+	FString Name("");
+	if (PropertyOwnerStruct)
+		return PropertyOwnerStruct->GetName();
+	return Name;
 }
 
 TArray<FString> UFastInputManager::GetAllPropertyNames(UClass* InClass)
@@ -227,6 +243,16 @@ bool UFastInputManager::FISaveJson(FString PropertyName, UClass* Class, UStruct*
 
 		if (FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter))
 		{
+			// Get the file directory
+			FString FileDirectory = FPaths::GetPath(FilePath);
+
+			// Check if the directory exists, and create it if not
+			if (!FPaths::DirectoryExists(FileDirectory))
+			{
+				IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+				PlatformFile.CreateDirectoryTree(*FileDirectory);
+			}
+
 			if (FFileHelper::SaveStringToFile(Content, *FilePath))
 			{
 				return true;

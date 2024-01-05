@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
@@ -10,7 +10,7 @@
 #include "Selection.h"
 #include "FastInputManager.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFastInputDetect, FString, PropertyName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnFastInputDetect, FString, PropertyName, UClass*, PropertyOwnerClass, UStruct*, PropertyOwnerStruct, UClass*, ObjectClass);
 
 UCLASS()
 class FASTINPUT_API UFastInputManager : public UObject
@@ -23,26 +23,34 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static UFastInputManager* Get();
 
-// ”–πÿ Û±Íµ„ª˜
+	// ÊúâÂÖ≥Èº†Ê†áÁÇπÂáª
 public:
 	void GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSharedPtr<SDetailSingleItemRow>& OutDetailSingleItemRow);
 	void GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleItemRow>& InDetailSingleItemRowPtr);
 
-// ”–πÿFIΩÁ√ÊÃ·π©∫Ø ˝
+	// ÊúâÂÖ≥FIÁïåÈù¢Êèê‰æõÂáΩÊï∞
 public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAllPropertyNames(UClass* InClass);
 	UFUNCTION(BlueprintCallable)
-	TArray<FString> GetAllSelections(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass);
+	TArray<FString> GetAllSelections(FString PropertyName, UClass* PropertyOwnerClass, UStruct* PropertyOwnerStruct, UClass* ObjectClass);
 	UFUNCTION(BlueprintCallable)
 	UClass* GetSelectedActorClass();
 	UFUNCTION(BlueprintCallable)
 	void SetEditableText(FString InputString);
-// ”–πÿJson
+	UFUNCTION(BlueprintCallable)
+	FString GetUClassName(UClass* PropertyOwnerClass);
+	UFUNCTION(BlueprintCallable)
+	FString GetUStructName(UStruct* PropertyOwnerStruct);
+	// ÊúâÂÖ≥Json
 public:
+	UFUNCTION(BlueprintCallable)
 	FString FIGetJsonPath(FString PropertyName, UClass* Class, UStruct* Struct);
+	UFUNCTION(BlueprintCallable)
 	TSharedPtr<FJsonObject> FIReadJson(const FString& FilePath);
+	UFUNCTION(BlueprintCallable)
 	TSharedPtr<FJsonObject> FIMakeJson(UDataTable* DT);
+	UFUNCTION(BlueprintCallable)
 	bool FISaveJson(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass, UDataTable* DT);
 
 public:
