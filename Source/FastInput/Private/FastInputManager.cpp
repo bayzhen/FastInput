@@ -95,7 +95,8 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		FString PropertyName = Property->GetName();
 		UClass* PropertyOwnerClass = Property->GetOwnerClass();
 		UStruct* PropertyOwnerStruct = Property->GetOwnerStruct();
-		OnFastInputDetect.Broadcast(PropertyName, PropertyOwnerClass, PropertyOwnerStruct, GetSelectedActorClass());
+		UClass* SelectActorClass = GetSelectedActorClass();
+		OnFastInputDetect.Broadcast(PropertyName, PropertyOwnerClass, PropertyOwnerStruct, SelectActorClass);
 	}
 }
 

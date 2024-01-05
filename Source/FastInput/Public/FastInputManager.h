@@ -52,7 +52,7 @@ public:
 	bool FISaveJson(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass, UDataTable* DT);
 
 public:
-	UPROPERTY(EditAnywhere, Category = "MLBridge")
+	UPROPERTY(EditAnywhere)
 	FOnFastInputDetect OnFastInputDetect;
 
 public:
