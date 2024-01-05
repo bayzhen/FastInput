@@ -46,9 +46,7 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	FString FIGetJsonPath(FString PropertyName, UClass* Class, UStruct* Struct);
-	UFUNCTION(BlueprintCallable)
 	TSharedPtr<FJsonObject> FIReadJson(const FString& FilePath);
-	UFUNCTION(BlueprintCallable)
 	TSharedPtr<FJsonObject> FIMakeJson(UDataTable* DT);
 	UFUNCTION(BlueprintCallable)
 	bool FISaveJson(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass, UDataTable* DT);
