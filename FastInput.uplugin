@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "FastInput",
+	"Description": "A way to accelarate the input process",
+	"Category": "Other",
+	"CreatedBy": "chenbaicheng",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "FastInput",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
