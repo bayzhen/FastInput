@@ -4,7 +4,7 @@
 	"VersionName": "1.0",
 	"FriendlyName": "FastInput",
 	"Description": "A way to accelarate the input process",
-	"Category": "Other",
+	"Category": "Editor",
 	"CreatedBy": "chenbaicheng",
 	"CreatedByURL": "",
 	"DocsURL": "",
@@ -17,7 +17,7 @@
 	"Modules": [
 		{
 			"Name": "FastInput",
-			"Type": "Runtime",
+			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
 	]

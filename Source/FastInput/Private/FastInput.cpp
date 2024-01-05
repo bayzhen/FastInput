@@ -10,6 +10,7 @@ void FFastInputModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	FSlateApplication& SlateApplication = FSlateApplication::Get();
 	SlateApplication.RegisterInputPreProcessor(MakeShareable(new FFastInputCustomInputListener()));
+	FastInputManager = NewObject<UFastInputManager>();
 }
 
 void FFastInputModule::ShutdownModule()

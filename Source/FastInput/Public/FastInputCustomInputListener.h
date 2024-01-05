@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
-#include "FastInputSubsystem.h"
+#include "FastInputManager.h"
 #include "Framework/Application/IInputProcessor.h"
 
 
@@ -49,7 +49,7 @@ public:
 
 	virtual bool HandleMouseButtonUpEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) { 
 		UE_LOG(LogTemp, Warning, TEXT("markov HandleMouseButtonUpEvent"));
-		UFastInputSubsystem* FastInputSubsystem = UFastInputSubsystem::Get();
+		UFastInputManager* FastInputSubsystem = UFastInputManager::Get();
 		TSharedPtr<SDetailSingleItemRow> DetailSingleItemRowPtr;
 		FastInputSubsystem->GetSDetailSingleItemRow(SlateApp, DetailSingleItemRowPtr);
 		FastInputSubsystem->GetAllPropertiesNameAndClass(DetailSingleItemRowPtr);
