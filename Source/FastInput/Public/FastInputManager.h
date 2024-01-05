@@ -10,7 +10,7 @@
 #include "Selection.h"
 #include "FastInputManager.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class FASTINPUT_API UFastInputManager : public UObject
 {
 	GENERATED_BODY()
@@ -51,7 +51,7 @@ public:
 
 public:
 	static UFastInputManager* self;
-	TSharedPtr<SEditableText> EditableTextSharedPtr;
+	TWeakPtr<SEditableText> EditableTextWeakPtr;
 	UPROPERTY(EditAnywhere)
 	FString PropertyName;
 	UPROPERTY(EditAnywhere)

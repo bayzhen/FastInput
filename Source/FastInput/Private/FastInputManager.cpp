@@ -6,6 +6,7 @@ UFastInputManager* UFastInputManager::self = nullptr;
 UFastInputManager::UFastInputManager()
 {
 	self = this;
+	EditableTextWeakPtr = nullptr;
 }
 
 UFastInputManager* UFastInputManager::Get()
@@ -26,8 +27,6 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow !WidgetPtr->GetTypeAsString().Equals(\"SEditableText\")"));
 		return;
 	}
-	EditableTextSharedPtr.Reset();
-	EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 	int depth = 20;
 	TSharedPtr<SWidget> TempWidgetSharedPtr;
 
@@ -40,6 +39,7 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		if (TempWidgetSharedPtr->GetTypeAsString().Equals("SDetailSingleItemRow")) {
 			TSharedPtr<SDetailSingleItemRow> DetailSingleItemRow = StaticCastSharedPtr<SDetailSingleItemRow>(TempWidgetSharedPtr);
 			OutDetailSingleItemRow = DetailSingleItemRow;
+			EditableTextWeakPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 			UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow OutDetailSingleItemRow found"));
 			return;
 		}
@@ -57,9 +57,9 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 
 	TArray<TSharedPtr<IPropertyHandle>> PropertyHandlePtrArray = InDetailSingleItemRowPtr->GetPropertyHandles();
 
-	/*for (auto& PropertyHandlePtr : PropertyHandlePtrArray) {
+	for (auto& PropertyHandlePtr : PropertyHandlePtrArray) {
 		FProperty* Property = PropertyHandlePtr->GetProperty();
-		auto PropertyName = Property->GetName();
+		auto PropertyNameT = Property->GetName();
 		auto PropertyNameCPP = Property->GetNameCPP();
 		auto PropertyClassName = Property->GetClass()->GetName();
 		UClass* PropertyOwnerClass = Property->GetOwnerClass();
@@ -69,7 +69,7 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 				LogTemp,
 				Warning,
 				TEXT("markov GetAllPropertiesNameAndClass Property GetName: %s \t GetNameCPP: %s \t GetClass->GetName: %s \t GetOwnerClass->GetName: %s"),
-				*PropertyName,
+				*PropertyNameT,
 				*PropertyNameCPP,
 				*PropertyClassName,
 				*PropertyOwnerClass->GetName()
@@ -80,14 +80,14 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 				LogTemp,
 				Warning,
 				TEXT("markov GetAllPropertiesNameAndClass Property GetName: %s \t GetNameCPP: %s \t GetStruct->GetName: %s \t GetOwnerStruct->GetName: %s"),
-				*PropertyName,
+				*PropertyNameT,
 				*PropertyNameCPP,
 				*PropertyClassName,
 				*PropertyOwnerStruct->GetName()
 			);
 		}
 
-	}*/
+	}
 
 	if (PropertyHandlePtrArray.Num()) {
 		TSharedPtr<IPropertyHandle> PropertyHandlePtr = PropertyHandlePtrArray[0];
@@ -131,7 +131,8 @@ UClass* UFastInputManager::GetSelectedActorClass()
 
 void UFastInputManager::SetEditableText(FString InputString)
 {
-	if (EditableTextSharedPtr.IsValid()) {
+	if (EditableTextWeakPtr.IsValid()) {
+		TSharedPtr<SEditableText> EditableTextSharedPtr = EditableTextWeakPtr.Pin();
 		EditableTextSharedPtr->SetText(FText::FromString(InputString));
 	}
 }
