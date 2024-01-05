@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAllPropertyNames(UClass* InClass);
 	UFUNCTION(BlueprintCallable)
-	TArray<FString> GetAllSelections(FString PropertyName, UClass* PropertyOwnerClass, UStruct* PropertyOwnerStruct, UClass* ObjectClass);
+	TArray<FString> GetAllSelections(FString InPropertyName, UClass* InPropertyOwnerClass, UStruct* InPropertyOwnerStruct, UClass* InObjectClass);
 	UFUNCTION(BlueprintCallable)
 	static UClass* GetSelectedActorClass();
 	UFUNCTION(BlueprintCallable)
@@ -47,17 +47,17 @@ public:
 	TSharedPtr<FJsonObject> FIReadJson(const FString& FilePath);
 	TSharedPtr<FJsonObject> FIMakeJson(UDataTable* DT);
 	UFUNCTION(BlueprintCallable)
-	bool FISaveJson(FString PropertyName, UClass* Class, UStruct* Struct, UClass* ObjectClass, UDataTable* DT);
+	bool FISaveJson(FString InPropertyName, UClass* InClass, UStruct* InStruct, UClass* InObjectClass, UDataTable* DT);
 
 public:
 	static UFastInputManager* self;
 	TWeakPtr<SEditableText> EditableTextWeakPtr;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString PropertyName;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString PropertyOwnerClassName;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString PropertyOwnerStructName;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString PropertyActorClassName;
 };

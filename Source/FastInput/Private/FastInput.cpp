@@ -11,6 +11,7 @@ void FFastInputModule::StartupModule()
 	FSlateApplication& SlateApplication = FSlateApplication::Get();
 	SlateApplication.RegisterInputPreProcessor(MakeShareable(new FFastInputCustomInputListener()));
 	FastInputManager = NewObject<UFastInputManager>();
+	FastInputManager->AddToRoot();
 }
 
 void FFastInputModule::ShutdownModule()
