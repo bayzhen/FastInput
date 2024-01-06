@@ -99,6 +99,7 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		PropertyOwnerClass = Property->GetOwnerClass();
 		PropertyOwnerStruct = Property->GetOwnerStruct();
 		PropertyActorClass = GetSelectedActorClass();
+		this->FIReadJson();
 		this->TriggerEUWEvent("Update");
 	}
 }
@@ -198,9 +199,9 @@ FString UFastInputManager::FIGetJsonPath()
 	return FilePath + FileName;
 }
 
-TArray<FString> UFastInputManager::GetAllSelections()
+void UFastInputManager::GetAllSelections()
 {
-	TArray<FString> Result;
+	Selections.Empty();
 
 	// Retrieve the data table from the reference
 	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DTRef));
@@ -227,17 +228,15 @@ TArray<FString> UFastInputManager::GetAllSelections()
 					FString Value = StringProperty->GetPropertyValue_InContainer(DataRow);
 
 					// Add the FString value to the result array
-					Result.Add(Value);
+					Selections.Add(Value);
 				}
 			}
 		}
 	}
-
-	return Result;
 }
 
 
-TSharedPtr<FJsonObject> UFastInputManager::FIReadJson()
+void UFastInputManager::FIReadJson()
 {
 	FString FilePath = FIGetJsonPath();
 	FString Content;

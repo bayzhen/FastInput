@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAllPropertyNames(UClass* InClass);
 	UFUNCTION(BlueprintCallable)
-	TArray<FString> GetAllSelections();
+	void GetAllSelections();
 	UFUNCTION(BlueprintCallable)
 	static UClass* GetSelectedActorClass();
 	UFUNCTION(BlueprintCallable)
@@ -70,4 +70,6 @@ public:
 	FString DTRef;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString ColumnName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
+	TArray<FString> Selections;
 };
