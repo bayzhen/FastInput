@@ -43,7 +43,7 @@ public:
 public:
 	// 有关Json
 	UFUNCTION(BlueprintCallable)
-	FString FIGetJsonPath(FString PropertyName, UClass* Class, UStruct* Struct);
+	FString FIGetJsonPath(FString InPropertyName, UClass* Class, UStruct* Struct);
 	TSharedPtr<FJsonObject> FIReadJson(const FString& FilePath);
 	TSharedPtr<FJsonObject> FIMakeJson(UDataTable* DT);
 	UFUNCTION(BlueprintCallable)
@@ -51,7 +51,7 @@ public:
 
 public:
 	static UFastInputManager* self;
-	TWeakPtr<SEditableText> EditableTextWeakPtr;
+	TSharedPtr<SEditableText> EditableTextSharedPtr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString PropertyName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")

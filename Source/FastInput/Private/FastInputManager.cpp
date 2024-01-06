@@ -6,7 +6,7 @@ UFastInputManager* UFastInputManager::self = nullptr;
 UFastInputManager::UFastInputManager()
 {
 	self = this;
-	EditableTextWeakPtr = nullptr;
+	EditableTextSharedPtr = nullptr;
 }
 
 UFastInputManager* UFastInputManager::Get()
@@ -39,7 +39,7 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		if (TempWidgetSharedPtr->GetTypeAsString().Equals("SDetailSingleItemRow")) {
 			TSharedPtr<SDetailSingleItemRow> DetailSingleItemRow = StaticCastSharedPtr<SDetailSingleItemRow>(TempWidgetSharedPtr);
 			OutDetailSingleItemRow = DetailSingleItemRow;
-			EditableTextWeakPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
+			EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 			UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow OutDetailSingleItemRow found"));
 			return;
 		}
@@ -131,8 +131,7 @@ UClass* UFastInputManager::GetSelectedActorClass()
 
 void UFastInputManager::SetEditableText(FString InputString)
 {
-	if (EditableTextWeakPtr.IsValid()) {
-		TSharedPtr<SEditableText> EditableTextSharedPtr = EditableTextWeakPtr.Pin();
+	if (EditableTextSharedPtr.IsValid()) {
 		EditableTextSharedPtr->SetText(FText::FromString(InputString));
 	}
 }
