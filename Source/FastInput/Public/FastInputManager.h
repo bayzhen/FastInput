@@ -58,6 +58,7 @@ private:
 public:
 	static UFastInputManager* self;
 	TSharedPtr<SEditableText> EditableTextSharedPtr;
+	FProperty* PropertyPtr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString PropertyName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
