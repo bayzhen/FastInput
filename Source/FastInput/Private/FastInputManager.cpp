@@ -3,6 +3,7 @@
 #include "EditorUtilityWidget.h"
 #include "EditorUtilityWidgetBlueprint.h"
 #include "Editor.h"
+#include "InputCoreTypes.h"
 
 UFastInputManager* UFastInputManager::self = nullptr;
 
@@ -30,11 +31,12 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow !WidgetPtr->GetTypeAsString().Equals(\"SEditableText\")"));
 		return;
 	}
+	EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 	int depth = 20;
-	TSharedPtr<SWidget> TempWidgetSharedPtr;
+	TSharedPtr<SWidget> TempWidgetSharedPtr = WidgetSharedPtr;
 
 	while (depth-- > 0) {
-		TempWidgetSharedPtr = WidgetSharedPtr->GetParentWidget();
+		TempWidgetSharedPtr = TempWidgetSharedPtr->GetParentWidget();
 		if (!TempWidgetSharedPtr.IsValid()) {
 			UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow !TempWidgetSharedPtr.IsValid()"));
 			return;
@@ -42,11 +44,9 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		if (TempWidgetSharedPtr->GetTypeAsString().Equals("SDetailSingleItemRow")) {
 			TSharedPtr<SDetailSingleItemRow> DetailSingleItemRow = StaticCastSharedPtr<SDetailSingleItemRow>(TempWidgetSharedPtr);
 			OutDetailSingleItemRow = DetailSingleItemRow;
-			EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 			UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow OutDetailSingleItemRow found"));
 			return;
 		}
-		WidgetSharedPtr = TempWidgetSharedPtr;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow OutDetailSingleItemRow not found"));
 }
@@ -94,12 +94,13 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 
 	if (PropertyHandlePtrArray.Num()) {
 		TSharedPtr<IPropertyHandle> PropertyHandlePtr = PropertyHandlePtrArray[0];
-		FProperty* Property = PropertyHandlePtr->GetProperty();
-		PropertyName = Property->GetName();
-		PropertyOwnerClass = Property->GetOwnerClass();
-		PropertyOwnerStruct = Property->GetOwnerStruct();
+		PropertyPtr = PropertyHandlePtr->GetProperty();
+		PropertyName = PropertyPtr->GetName();
+		PropertyOwnerClass = PropertyPtr->GetOwnerClass();
+		PropertyOwnerStruct = PropertyPtr->GetOwnerStruct();
 		PropertyActorClass = GetSelectedActorClass();
 		this->FIReadJson();
+		this->GetAllSelections();
 		this->TriggerEUWEvent("Update");
 	}
 }
@@ -133,8 +134,16 @@ UClass* UFastInputManager::GetSelectedActorClass()
 
 void UFastInputManager::SetEditableText(FString InputString)
 {
-	if (EditableTextSharedPtr.IsValid()) {
-		EditableTextSharedPtr->SetText(FText::FromString(InputString));
+	if (EditableTextSharedPtr.IsValid())
+	{
+		auto Type = EditableTextSharedPtr->GetTypeAsString();
+		if (Type.Equals("SEditableText")) {
+			EditableTextSharedPtr->SetText(FText::FromString(InputString));
+			EditableTextSharedPtr->OnTextCommitted(EditableTextSharedPtr->GetText(), ETextCommit::Default);
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("markov EditableTextSharedPtr->GetTypeAsString() %s"), *Type);
+		}
 	}
 }
 
@@ -219,16 +228,21 @@ void UFastInputManager::GetAllSelections()
 
 			if (RowStruct)
 			{
-				// Get the property from the struct using the specified column name
-				FProperty* Property = RowStruct->FindPropertyByName(*ColumnName);
+				if (ColumnName.Equals("RowName",ESearchCase::IgnoreCase)) {
+					Selections.Add(RowPair.Key.ToString());
+				}
+				else {
+					// Get the property from the struct using the specified column name
+					FProperty* Property = RowStruct->FindPropertyByName(*ColumnName);
 
-				if (Property && Property->IsA<FStrProperty>())
-				{
-					FStrProperty* StringProperty = Cast<FStrProperty>(Property);
-					FString Value = StringProperty->GetPropertyValue_InContainer(DataRow);
+					if (Property && Property->IsA<FStrProperty>())
+					{
+						FStrProperty* StringProperty = CastField<FStrProperty>(Property);
+						FString Value = StringProperty->GetPropertyValue_InContainer(DataRow);
 
-					// Add the FString value to the result array
-					Selections.Add(Value);
+						// Add the FString value to the result array
+						Selections.Add(Value);
+					}
 				}
 			}
 		}
