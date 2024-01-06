@@ -1,5 +1,8 @@
 #include "FastInputManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "EditorUtilityWidget.h"
+#include "EditorUtilityWidgetBlueprint.h"
+#include "Editor.h"
 
 UFastInputManager* UFastInputManager::self = nullptr;
 
@@ -62,8 +65,8 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		auto PropertyNameT = Property->GetName();
 		auto PropertyNameCPP = Property->GetNameCPP();
 		auto PropertyClassName = Property->GetClass()->GetName();
-		UClass* PropertyOwnerClass = Property->GetOwnerClass();
-		UStruct* PropertyOwnerStruct = Property->GetOwnerStruct();
+		PropertyOwnerClass = Property->GetOwnerClass();
+		PropertyOwnerStruct = Property->GetOwnerStruct();
 		if (PropertyOwnerClass) {
 			UE_LOG(
 				LogTemp,
@@ -93,12 +96,10 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		TSharedPtr<IPropertyHandle> PropertyHandlePtr = PropertyHandlePtrArray[0];
 		FProperty* Property = PropertyHandlePtr->GetProperty();
 		PropertyName = Property->GetName();
-		UClass* PropertyOwnerClass = Property->GetOwnerClass();
-		if (PropertyOwnerClass) PropertyOwnerClassName = PropertyOwnerClass->GetName();
-		UStruct* PropertyOwnerStruct = Property->GetOwnerStruct();
-		if (PropertyOwnerClass) PropertyOwnerStructName = PropertyOwnerStruct->GetName();
-		UClass* SelectActorClass = GetSelectedActorClass();
-		if (PropertyOwnerClass) PropertyActorClassName = SelectActorClass->GetName();
+		PropertyOwnerClass = Property->GetOwnerClass();
+		PropertyOwnerStruct = Property->GetOwnerStruct();
+		PropertyActorClass = GetSelectedActorClass();
+		this->TriggerEUWEvent("Update");
 	}
 }
 
@@ -152,6 +153,21 @@ FString UFastInputManager::GetUStructName(UStruct* PropertyOwnerStruct)
 	return Name;
 }
 
+void UFastInputManager::TriggerEUWEvent(FString EventName)
+{
+	FStringAssetReference WidgetAssetPath(TEXT("/FastInput/EUW_FastInput.EUW_FastInput"));
+	UEditorUtilityWidgetBlueprint* WidgetBlueprint = Cast<UEditorUtilityWidgetBlueprint>(WidgetAssetPath.TryLoad());
+	if (WidgetBlueprint) {
+		UEditorUtilityWidget* FastInputWidget = WidgetBlueprint->GetCreatedWidget();
+		if (FastInputWidget) {
+			UFunction* TriggerHelloFunction = FastInputWidget->FindFunction(*EventName);
+			if (TriggerHelloFunction) {
+				FastInputWidget->ProcessEvent(TriggerHelloFunction, nullptr);
+			}
+		}
+	}
+}
+
 TArray<FString> UFastInputManager::GetAllPropertyNames(UClass* InClass)
 {
 	TArray<FString> PropertyNamesArray;
@@ -169,41 +185,61 @@ TArray<FString> UFastInputManager::GetAllPropertyNames(UClass* InClass)
 	return PropertyNamesArray;
 }
 
-FString UFastInputManager::FIGetJsonPath(FString InPropertyName, UClass* InClass, UStruct* InStruct)
+FString UFastInputManager::FIGetJsonPath()
 {
 	FString FilePath(FPaths::ProjectContentDir() + "FastInput/");
-	FString FileName(InPropertyName + " ");
-	if (InClass) {
-		FileName += InClass->GetName() + ".json";
+	FString FileName("");
+	if (PropertyOwnerStruct) {
+		FileName = PropertyOwnerStruct->GetName() + " " + PropertyName + ".json";
 	}
-	if (InStruct) {
-		FileName += InStruct->GetName() + ".json";
+	else {
+		return FString("");
 	}
 	return FilePath + FileName;
 }
 
-TArray<FString> UFastInputManager::GetAllSelections(FString InPropertyName, UClass* InClass, UStruct* InStruct, UClass* ObjectClass)
+TArray<FString> UFastInputManager::GetAllSelections()
 {
-	TArray<FString> SelectionsArray;
-	TSharedPtr<FJsonObject> PropertyFastInputJsonSPtr = FIReadJson(FIGetJsonPath(InPropertyName, InClass, InStruct));
-	if (!PropertyFastInputJsonSPtr) return SelectionsArray;
-	FString DTRef = PropertyFastInputJsonSPtr->GetStringField("DTRef");
-	UDataTable* DT = nullptr;
-	ConstructorHelpers::FObjectFinder<UDataTable> DataTableAsset(TEXT("DataTable'/Game/Path/To/Your/DataTable.DataTable'"));
-	if (DataTableAsset.Object != NULL)
+	TArray<FString> Result;
+
+	// Retrieve the data table from the reference
+	UDataTable* DataTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *DTRef));
+
+	if (DataTable)
 	{
-		DT = DataTableAsset.Object;
-	}
-	if (DT) {
-		for (auto& RowName : DT->GetRowNames()) {
-			SelectionsArray.Add(RowName.ToString());
+		// Get the row map from the data table
+		const TMap<FName, uint8*>& RowMap = DataTable->GetRowMap();
+
+		for (const auto& RowPair : RowMap)
+		{
+			// Get the row struct
+			const UScriptStruct* RowStruct = DataTable->GetRowStruct();
+			uint8* DataRow = RowPair.Value;
+
+			if (RowStruct)
+			{
+				// Get the property from the struct using the specified column name
+				FProperty* Property = RowStruct->FindPropertyByName(*ColumnName);
+
+				if (Property && Property->IsA<FStrProperty>())
+				{
+					FStrProperty* StringProperty = Cast<FStrProperty>(Property);
+					FString Value = StringProperty->GetPropertyValue_InContainer(DataRow);
+
+					// Add the FString value to the result array
+					Result.Add(Value);
+				}
+			}
 		}
 	}
-	return SelectionsArray;
+
+	return Result;
 }
 
-TSharedPtr<FJsonObject> UFastInputManager::FIReadJson(const FString& FilePath)
+
+TSharedPtr<FJsonObject> UFastInputManager::FIReadJson()
 {
+	FString FilePath = FIGetJsonPath();
 	FString Content;
 	if (FFileHelper::LoadFileToString(Content, *FilePath))
 	{
@@ -212,33 +248,32 @@ TSharedPtr<FJsonObject> UFastInputManager::FIReadJson(const FString& FilePath)
 
 		if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
 		{
-			return JsonObject;
+			DTRef = JsonObject->GetStringField("DTRef");
+			ColumnName = JsonObject->GetStringField("ColumnName");
 		}
 		else
 		{
 			UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON file: %s"), *FilePath);
-			return nullptr;
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *FilePath);
-		return nullptr;
 	}
 }
 
-TSharedPtr<FJsonObject> UFastInputManager::FIMakeJson(UDataTable* DT)
+TSharedPtr<FJsonObject> UFastInputManager::FIMakeJson()
 {
-	FString DTRef = DT->GetPathName();
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField(TEXT("DTRef"), DTRef);
+	JsonObject->SetStringField("DTRef", DTRef);
+	JsonObject->SetStringField("ColumnName", ColumnName);
 	return JsonObject;
 }
 
-bool UFastInputManager::FISaveJson(FString InPropertyName, UClass* InClass, UStruct* InStruct, UClass* ObjectClass, UDataTable* DT)
+bool UFastInputManager::FISaveJson()
 {
-	FString FilePath = FIGetJsonPath(InPropertyName, InClass, InStruct);
-	TSharedPtr<FJsonObject> JsonObject = FIMakeJson(DT);
+	FString FilePath = FIGetJsonPath();
+	TSharedPtr<FJsonObject> JsonObject = FIMakeJson();
 
 	if (JsonObject.IsValid())
 	{

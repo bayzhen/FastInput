@@ -42,7 +42,10 @@ public class FastInput : ModuleRules
                 "PropertyEditor",
                 "AssetRegistry",
 				"Json",
-				"UnrealEd"
+				"UnrealEd",
+                "Blutility",
+                "UMGEditor",
+                "EditorScriptingUtilities"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

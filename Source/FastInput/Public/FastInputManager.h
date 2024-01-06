@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAllPropertyNames(UClass* InClass);
 	UFUNCTION(BlueprintCallable)
-	TArray<FString> GetAllSelections(FString InPropertyName, UClass* InPropertyOwnerClass, UStruct* InPropertyOwnerStruct, UClass* InObjectClass);
+	TArray<FString> GetAllSelections();
 	UFUNCTION(BlueprintCallable)
 	static UClass* GetSelectedActorClass();
 	UFUNCTION(BlueprintCallable)
@@ -41,13 +41,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static FString GetUStructName(UStruct* PropertyOwnerStruct);
 public:
+	// 触发FI界面事件
+	UFUNCTION(BlueprintCallable)
+	void TriggerEUWEvent(FString EventName);
+public:
 	// 有关Json
 	UFUNCTION(BlueprintCallable)
-	FString FIGetJsonPath(FString InPropertyName, UClass* Class, UStruct* Struct);
-	TSharedPtr<FJsonObject> FIReadJson(const FString& FilePath);
-	TSharedPtr<FJsonObject> FIMakeJson(UDataTable* DT);
+	FString FIGetJsonPath();
 	UFUNCTION(BlueprintCallable)
-	bool FISaveJson(FString InPropertyName, UClass* InClass, UStruct* InStruct, UClass* InObjectClass, UDataTable* DT);
+	void FIReadJson();
+	UFUNCTION(BlueprintCallable)
+	bool FISaveJson();
+private:
+	TSharedPtr<FJsonObject> FIMakeJson();
 
 public:
 	static UFastInputManager* self;
@@ -55,9 +61,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString PropertyName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
-	FString PropertyOwnerClassName;
+	UClass* PropertyOwnerClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
-	FString PropertyOwnerStructName;
+	UStruct* PropertyOwnerStruct;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
-	FString PropertyActorClassName;
+	UClass* PropertyActorClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
+	FString DTRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
+	FString ColumnName;
 };
