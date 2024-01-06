@@ -9,7 +9,6 @@ UFastInputManager* UFastInputManager::self = nullptr;
 
 UFastInputManager::UFastInputManager()
 {
-	self = this;
 	EditableTextSharedPtr = nullptr;
 }
 
@@ -100,7 +99,7 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		PropertyOwnerStruct = PropertyPtr->GetOwnerStruct();
 		PropertyActorClass = GetSelectedActorClass();
 		this->FIReadJson();
-		this->GetAllSelections();
+		this->GetSelections();
 		this->TriggerEUWEvent("Update");
 	}
 }
@@ -208,7 +207,7 @@ FString UFastInputManager::FIGetJsonPath()
 	return FilePath + FileName;
 }
 
-void UFastInputManager::GetAllSelections()
+void UFastInputManager::GetSelections()
 {
 	Selections.Empty();
 
@@ -228,7 +227,7 @@ void UFastInputManager::GetAllSelections()
 
 			if (RowStruct)
 			{
-				if (ColumnName.Equals("RowName",ESearchCase::IgnoreCase)) {
+				if (ColumnName.Equals("RowName", ESearchCase::IgnoreCase)) {
 					Selections.Add(RowPair.Key.ToString());
 				}
 				else {
@@ -249,7 +248,6 @@ void UFastInputManager::GetAllSelections()
 	}
 }
 
-
 void UFastInputManager::FIReadJson()
 {
 	FString FilePath = FIGetJsonPath();
@@ -261,8 +259,14 @@ void UFastInputManager::FIReadJson()
 
 		if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
 		{
-			DTRef = JsonObject->GetStringField("DTRef");
-			ColumnName = JsonObject->GetStringField("ColumnName");
+			if (PropertyActorClass) {
+				DTRef = JsonObject->GetObjectField("DTRef")->GetStringField(PropertyActorClass->GetName());
+				ColumnName = JsonObject->GetObjectField("ColumnName")->GetStringField(PropertyActorClass->GetName());
+			}
+			else {
+				DTRef = JsonObject->GetObjectField("DTRef")->GetStringField("Default");
+				ColumnName = JsonObject->GetObjectField("ColumnName")->GetStringField("Default");
+			}
 		}
 		else
 		{
@@ -278,8 +282,20 @@ void UFastInputManager::FIReadJson()
 TSharedPtr<FJsonObject> UFastInputManager::FIMakeJson()
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField("DTRef", DTRef);
-	JsonObject->SetStringField("ColumnName", ColumnName);
+	TSharedPtr<FJsonObject> DTRefJsonObject = MakeShareable(new FJsonObject);
+	TSharedPtr<FJsonObject> ColumnNameJsonObject = MakeShareable(new FJsonObject);
+	if (PropertyActorClass) {
+		DTRefJsonObject->SetStringField(PropertyActorClass->GetName(), DTRef);
+		ColumnNameJsonObject->SetStringField(PropertyActorClass->GetName(), ColumnName);
+		JsonObject->SetObjectField("DTRef", DTRefJsonObject);
+		JsonObject->SetObjectField("ColumnName", ColumnNameJsonObject);
+	}
+	else {
+		DTRefJsonObject->SetStringField("Default", DTRef);
+		ColumnNameJsonObject->SetStringField("Default", ColumnName);
+		JsonObject->SetObjectField("DTRef", DTRefJsonObject);
+		JsonObject->SetObjectField("ColumnName", ColumnNameJsonObject);
+	}
 	return JsonObject;
 }
 

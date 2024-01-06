@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAllPropertyNames(UClass* InClass);
 	UFUNCTION(BlueprintCallable)
-	void GetAllSelections();
+	void GetSelections();
 	UFUNCTION(BlueprintCallable)
 	static UClass* GetSelectedActorClass();
 	UFUNCTION(BlueprintCallable)
@@ -40,6 +40,9 @@ public:
 	static FString GetUClassName(UClass* PropertyOwnerClass);
 	UFUNCTION(BlueprintCallable)
 	static FString GetUStructName(UStruct* PropertyOwnerStruct);
+public:
+	// 用户覆写函数
+	// 属性名 + 类名 + 对象类名 → 其它属性名 → 其它属性选项 → 最终选项
 public:
 	// 触发FI界面事件
 	UFUNCTION(BlueprintCallable)
@@ -71,6 +74,10 @@ public:
 	FString DTRef;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	FString ColumnName;
+	// 从DT等资源中读出的选项
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	TArray<FString> Selections;
+	// 由自定义函数得出的选项
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
+	TArray<FString> CustomSelections;
 };

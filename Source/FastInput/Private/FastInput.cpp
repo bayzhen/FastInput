@@ -10,8 +10,9 @@ void FFastInputModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	FSlateApplication& SlateApplication = FSlateApplication::Get();
 	SlateApplication.RegisterInputPreProcessor(MakeShareable(new FFastInputCustomInputListener()));
-	FString BP_FastInputManagerPath = TEXT("/Script/Engine.Blueprint'/FastInput/BP_FastInputManager.BP_FastInputManager'");
-	FastInputManager = StaticLoadObject(UObject::StaticClass(), nullptr, *BP_FastInputManagerPath);
+
+	FastInputManager = NewObject<UFastInputManager>(GetTransientPackage(), UFastInputManager::StaticClass());
+	UFastInputManager::self = Cast<UFastInputManager>(FastInputManager);
 	FastInputManager->AddToRoot();
 }
 
