@@ -258,6 +258,9 @@ void UFastInputManager::GetSelections()
 			}
 		}
 	}
+	else {
+		Selections.Empty();
+	}
 }
 
 void UFastInputManager::FIReadJson()
@@ -282,15 +285,15 @@ void UFastInputManager::FIReadJson()
 		}
 		else
 		{
-			this->Selections.Empty();
-			this->CustomSelections.Empty();
+			DTRef.Empty();
+			ColumnName.Empty();
 			UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON file: %s"), *FilePath);
 		}
 	}
 	else
 	{
-		this->Selections.Empty();
-		this->CustomSelections.Empty();
+		DTRef.Empty();
+		ColumnName.Empty();
 		UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *FilePath);
 	}
 }
