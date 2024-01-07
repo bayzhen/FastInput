@@ -34,6 +34,9 @@ void FFastInputModule::StartupModule()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Unable to load Blueprint asset '%s'"), *BlueprintPath);
 	}
+
+	FSlateStyleRegistry::RegisterSlateStyle(*FFastInputEditorStyle::Get());
+
 }
 
 void FFastInputModule::ShutdownModule()

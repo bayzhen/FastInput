@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "FastInputEditorStyle.h"
 
 class FFastInputModule : public IModuleInterface
 {
