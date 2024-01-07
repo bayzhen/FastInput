@@ -56,7 +56,7 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 
 	TArray<TSharedPtr<IPropertyHandle>> PropertyHandlePtrArray = InDetailSingleItemRowPtr->GetPropertyHandles();
 
-	for (auto& PropertyHandlePtr : PropertyHandlePtrArray) {
+	/*for (auto& PropertyHandlePtr : PropertyHandlePtrArray) {
 		FProperty* Property = PropertyHandlePtr->GetProperty();
 		auto PropertyNameT = Property->GetName();
 		auto PropertyNameCPP = Property->GetNameCPP();
@@ -86,7 +86,7 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 			);
 		}
 
-	}
+	}*/
 
 	if (PropertyHandlePtrArray.Num()) {
 		TSharedPtr<IPropertyHandle> PropertyHandlePtr = PropertyHandlePtrArray[0];
