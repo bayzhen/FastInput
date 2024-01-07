@@ -11,7 +11,7 @@ public:
 	{
 		// Initialize and register your custom style resources here
 		const FVector2D IconSize(512.0f, 512.0f);
-		FSlateImageBrush* IconBrush = new FSlateImageBrush(FPaths::ProjectPluginsDir() + "FastInput/Resources/Wings", IconSize);
+		FSlateImageBrush* IconBrush = new FSlateImageBrush(FPaths::ProjectPluginsDir() + "FastInput/Resources/Wings.png", IconSize);
 		Set("FastInputEditorStyle.FastInputIcon", IconBrush);
 	}
 
