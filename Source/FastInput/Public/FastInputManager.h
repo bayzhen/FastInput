@@ -8,6 +8,12 @@
 #include "Editor/PropertyEditor/Private/SDetailSingleItemRow.h"
 #include "Misc/Paths.h"
 #include "Selection.h"
+#include "Kismet/GameplayStatics.h"
+#include "EditorUtilityWidget.h"
+#include "EditorUtilityWidgetBlueprint.h"
+#include "Editor.h"
+#include "InputCoreTypes.h"
+#include "LevelEditor.h"
 #include "FastInputManager.generated.h"
 
 UCLASS(Blueprintable)
@@ -47,6 +53,7 @@ public:
 	void UpdateCustomSelections();
 public:
 	// 触发FI界面事件
+	void SpawnEditorWidgetWindow();
 	UFUNCTION(BlueprintCallable)
 	void TriggerEUWEvent(FString EventName);
 public:
@@ -63,6 +70,7 @@ private:
 public:
 	static UFastInputManager* FastInputManagerCppInstance;
 	static UObject* FastInputManagerBPInstance;
+	static TWeakPtr<SWindow> EditorWidgetWindow;
 
 	TSharedPtr<SEditableText> EditableTextSharedPtr;
 	FProperty* PropertyPtr;
@@ -86,4 +94,5 @@ public:
 	// 由自定义函数得出的选项
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	TArray<FString> CustomSelections;
+
 };

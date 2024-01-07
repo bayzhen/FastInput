@@ -1,12 +1,8 @@
 #include "FastInputManager.h"
-#include "Kismet/GameplayStatics.h"
-#include "EditorUtilityWidget.h"
-#include "EditorUtilityWidgetBlueprint.h"
-#include "Editor.h"
-#include "InputCoreTypes.h"
 
 UFastInputManager* UFastInputManager::FastInputManagerCppInstance = nullptr;
 UObject* UFastInputManager::FastInputManagerBPInstance = nullptr;
+TWeakPtr<SWindow> UFastInputManager::EditorWidgetWindow = nullptr;
 
 UFastInputManager::UFastInputManager()
 {
@@ -167,6 +163,49 @@ FString UFastInputManager::GetUStructName(UStruct* PropertyOwnerStruct)
 
 void UFastInputManager::UpdateCustomSelections_Implementation()
 {
+}
+
+const FName EditorWidgetTabId = FName(TEXT("FastInputEditorWindow"));
+
+TSharedRef<SDockTab> SpawnEditorWidgetTab(const FSpawnTabArgs& Args, UEditorUtilityWidgetBlueprint* WidgetBlueprint)
+{
+	check(Args.GetTabId() == EditorWidgetTabId);
+	// Create the widget instance and wrap it in a TSharedRef.
+	TSharedRef<SWidget> EditorWidget = WidgetBlueprint->CreateUtilityWidget();
+
+	// Create a new SDockTab and set its content to the EditorWidget.
+	return SNew(SDockTab)
+		.TabRole(ETabRole::PanelTab)
+		[
+			EditorWidget
+		];
+}
+
+
+void UFastInputManager::SpawnEditorWidgetWindow()
+{
+	FStringAssetReference WidgetAssetPath(TEXT("/FastInput/EUW_FastInput.EUW_FastInput"));
+	UEditorUtilityWidgetBlueprint* WidgetBlueprint = Cast<UEditorUtilityWidgetBlueprint>(WidgetAssetPath.TryLoad());
+    if (!WidgetBlueprint) return;
+
+    // Get the Level Editor's TabManager from the LevelEditor module.
+    TSharedPtr<FTabManager> LevelEditorTabManager = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetLevelEditorTabManager();
+
+    if (LevelEditorTabManager->HasTabSpawner(EditorWidgetTabId))
+    {
+        // If the tab spawner is already registered, invoke the existing tab.
+        LevelEditorTabManager->TryInvokeTab(EditorWidgetTabId);
+    }
+    else
+    {
+        // Otherwise, register the tab spawner.
+        LevelEditorTabManager->RegisterTabSpawner(EditorWidgetTabId, FOnSpawnTab::CreateStatic(&SpawnEditorWidgetTab, WidgetBlueprint))
+            .SetDisplayName(FText::FromString(TEXT("")))
+            .SetTooltipText(FText::FromString(TEXT("")));
+
+        // Invoke the newly registered tab.
+        LevelEditorTabManager->TryInvokeTab(EditorWidgetTabId);
+    }
 }
 
 void UFastInputManager::TriggerEUWEvent(FString EventName)

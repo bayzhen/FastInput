@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "FastInputManager.h"
 #include "FastInputEditorStyle.h"
 #include "LevelEditor.h"
 
@@ -18,7 +19,7 @@ public:
 	void AddToolbarExtension(FToolBarBuilder& Builder);
 	UObject* FastInputManager;
 	void MyButtonClicked() {
-		UE_LOG(LogTemp, Log, TEXT("Markov"));
+		UFastInputManager::GetCppInstance()->SpawnEditorWidgetWindow();
 	}
 	
 };
