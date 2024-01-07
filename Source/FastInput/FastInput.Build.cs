@@ -46,7 +46,9 @@ public class FastInput : ModuleRules
                 "Blutility",
                 "UMGEditor",
                 "EditorScriptingUtilities",
-                "InputCore"
+                "InputCore",
+				"LevelEditor",
+				"EditorStyle"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
