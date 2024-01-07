@@ -96,4 +96,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	TArray<FString> CustomSelections;
 
+	TSharedPtr<FJsonObject> JsonObject;
 };

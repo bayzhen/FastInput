@@ -269,7 +269,6 @@ void UFastInputManager::FIReadJson()
 	FString Content;
 	if (FFileHelper::LoadFileToString(Content, *FilePath))
 	{
-		TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
 		TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(Content);
 
 		if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
@@ -287,6 +286,7 @@ void UFastInputManager::FIReadJson()
 		{
 			DTRef.Empty();
 			ColumnName.Empty();
+			JsonObject = MakeShareable(new FJsonObject());
 			UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON file: %s"), *FilePath);
 		}
 	}
@@ -294,15 +294,19 @@ void UFastInputManager::FIReadJson()
 	{
 		DTRef.Empty();
 		ColumnName.Empty();
+		JsonObject = MakeShareable(new FJsonObject());
 		UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *FilePath);
 	}
 }
 
 TSharedPtr<FJsonObject> UFastInputManager::FIMakeJson()
 {
-	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	TSharedPtr<FJsonObject> DTRefJsonObject = MakeShareable(new FJsonObject);
 	TSharedPtr<FJsonObject> ColumnNameJsonObject = MakeShareable(new FJsonObject);
+	if (JsonObject) {
+		DTRefJsonObject = JsonObject->GetObjectField("DTRef");
+		ColumnNameJsonObject = JsonObject->GetObjectField("ColumnName");
+	}
 	if (PropertyActorClass) {
 		DTRefJsonObject->SetStringField(PropertyActorClass->GetName(), DTRef);
 		ColumnNameJsonObject->SetStringField(PropertyActorClass->GetName(), ColumnName);
@@ -321,7 +325,7 @@ TSharedPtr<FJsonObject> UFastInputManager::FIMakeJson()
 bool UFastInputManager::FISaveJson()
 {
 	FString FilePath = FIGetJsonPath();
-	TSharedPtr<FJsonObject> JsonObject = FIMakeJson();
+	JsonObject = FIMakeJson();
 
 	if (JsonObject.IsValid())
 	{
