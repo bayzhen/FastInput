@@ -31,7 +31,6 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow !WidgetPtr->GetTypeAsString().Equals(\"SEditableText\")"));
 		return;
 	}
-	EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 	int depth = 20;
 	TSharedPtr<SWidget> TempWidgetSharedPtr = WidgetSharedPtr;
 
@@ -44,6 +43,7 @@ void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSh
 		if (TempWidgetSharedPtr->GetTypeAsString().Equals("SDetailSingleItemRow")) {
 			TSharedPtr<SDetailSingleItemRow> DetailSingleItemRow = StaticCastSharedPtr<SDetailSingleItemRow>(TempWidgetSharedPtr);
 			OutDetailSingleItemRow = DetailSingleItemRow;
+			EditableTextSharedPtr = StaticCastSharedPtr<SEditableText>(WidgetSharedPtr);
 			UE_LOG(LogTemp, Warning, TEXT("markov GetSDetailSingleItemRow OutDetailSingleItemRow found"));
 			return;
 		}
@@ -98,9 +98,11 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		PropertyName = PropertyPtr->GetName();
 		PropertyOwnerClass = PropertyPtr->GetOwnerClass();
 		PropertyOwnerStruct = PropertyPtr->GetOwnerStruct();
+		PropertyOwnerStructName = PropertyOwnerStruct->GetName();
 		PropertyActorClass = GetSelectedActorClass();
 		this->FIReadJson();
 		this->GetSelections();
+		this->UpdateCustomSelections();
 		this->TriggerEUWEvent("Update");
 	}
 }
@@ -163,6 +165,10 @@ FString UFastInputManager::GetUStructName(UStruct* PropertyOwnerStruct)
 	return Name;
 }
 
+void UFastInputManager::UpdateCustomSelections_Implementation()
+{
+}
+
 void UFastInputManager::TriggerEUWEvent(FString EventName)
 {
 	FStringAssetReference WidgetAssetPath(TEXT("/FastInput/EUW_FastInput.EUW_FastInput"));
@@ -199,12 +205,7 @@ FString UFastInputManager::FIGetJsonPath()
 {
 	FString FilePath(FPaths::ProjectContentDir() + "FastInput/");
 	FString FileName("");
-	if (PropertyOwnerStruct) {
-		FileName = PropertyOwnerStruct->GetName() + " " + PropertyName + ".json";
-	}
-	else {
-		return FString("");
-	}
+	FileName = PropertyOwnerStructName + " " + PropertyName + ".json";
 	return FilePath + FileName;
 }
 

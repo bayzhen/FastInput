@@ -43,6 +43,8 @@ public:
 public:
 	// 用户覆写函数
 	// 属性名 + 类名 + 对象类名 → 其它属性名 → 其它属性选项 → 最终选项
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "FastInput")
+	void UpdateCustomSelections();
 public:
 	// 触发FI界面事件
 	UFUNCTION(BlueprintCallable)
@@ -70,6 +72,8 @@ public:
 	UClass* PropertyOwnerClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	UStruct* PropertyOwnerStruct;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
+	FString PropertyOwnerStructName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
 	UClass* PropertyActorClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")
