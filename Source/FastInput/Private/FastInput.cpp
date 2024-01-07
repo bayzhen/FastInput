@@ -39,7 +39,7 @@ void FFastInputModule::StartupModule()
 
 	// Register the extension in the level editor toolbar
 	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
-	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
+	ToolbarExtender = MakeShareable(new FExtender);
 	ToolbarExtender->AddToolBarExtension("Content", EExtensionHook::After, nullptr, FToolBarExtensionDelegate::CreateRaw(this, &FFastInputModule::AddToolbarExtension));
 	LevelEditorModule.GetToolBarExtensibilityManager()->AddExtender(ToolbarExtender);
 
@@ -49,9 +49,19 @@ void FFastInputModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-	FSlateApplication& SlateApplication = FSlateApplication::Get();
 	FastInputManager->RemoveFromRoot();
+
+	// Unregister the Slate style
+	FSlateStyleRegistry::UnRegisterSlateStyle(*FFastInputEditorStyle::Get());
+
+	// Unregister the extension in the level editor toolbar
+	FLevelEditorModule* LevelEditorModule = FModuleManager::GetModulePtr<FLevelEditorModule>("LevelEditor");
+	if (LevelEditorModule != nullptr)
+	{
+		LevelEditorModule->GetToolBarExtensibilityManager()->RemoveExtender(ToolbarExtender);
+	}
 }
+
 
 void FFastInputModule::AddToolbarExtension(FToolBarBuilder& Builder)
 {

@@ -21,5 +21,6 @@ public:
 	void MyButtonClicked() {
 		UFastInputManager::GetCppInstance()->RunEditorWidgetWindow();
 	}
-	
+private:
+	TSharedPtr<FExtender> ToolbarExtender;	
 };
