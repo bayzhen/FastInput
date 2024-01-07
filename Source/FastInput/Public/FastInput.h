@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 #include "FastInputEditorStyle.h"
+#include "LevelEditor.h"
 
 class FFastInputModule : public IModuleInterface
 {
@@ -14,5 +15,10 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 public:
+	void AddToolbarExtension(FToolBarBuilder& Builder);
 	UObject* FastInputManager;
+	void MyButtonClicked() {
+		UE_LOG(LogTemp, Log, TEXT("Markov"));
+	}
+	
 };

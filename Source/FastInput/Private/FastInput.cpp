@@ -37,6 +37,12 @@ void FFastInputModule::StartupModule()
 
 	FSlateStyleRegistry::RegisterSlateStyle(*FFastInputEditorStyle::Get());
 
+	// Register the extension in the level editor toolbar
+	FLevelEditorModule& LevelEditorModule = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor");
+	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
+	ToolbarExtender->AddToolBarExtension("Content", EExtensionHook::After, nullptr, FToolBarExtensionDelegate::CreateRaw(this, &FFastInputModule::AddToolbarExtension));
+	LevelEditorModule.GetToolBarExtensibilityManager()->AddExtender(ToolbarExtender);
+
 }
 
 void FFastInputModule::ShutdownModule()
@@ -45,6 +51,19 @@ void FFastInputModule::ShutdownModule()
 	// we call this function before unloading the module.
 	FSlateApplication& SlateApplication = FSlateApplication::Get();
 	FastInputManager->RemoveFromRoot();
+}
+
+void FFastInputModule::AddToolbarExtension(FToolBarBuilder& Builder)
+{
+	Builder.AddToolBarButton(
+		FUIAction(FExecuteAction::CreateRaw(this, &FFastInputModule::MyButtonClicked)),
+		NAME_None,
+		FText::FromString("My Button"),
+		FText::FromString("Click to perform an action"),
+		FSlateIcon(FFastInputEditorStyle::Get()->GetStyleSetName(), "FastInputEditorStyle.FastInputIcon"),
+		EUserInterfaceActionType::Button,
+		NAME_None
+	);
 }
 
 #undef LOCTEXT_NAMESPACE

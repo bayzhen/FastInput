@@ -10,8 +10,8 @@ public:
 		: FSlateStyleSet("FastInputEditorStyle")
 	{
 		// Initialize and register your custom style resources here
-		const FVector2D IconSize(40.0f, 40.0f);
-		FSlateImageBrush* IconBrush = new FSlateImageBrush(FPaths::ProjectPluginsDir() + "FastInput/Resources/Icon128", IconSize);
+		const FVector2D IconSize(512.0f, 512.0f);
+		FSlateImageBrush* IconBrush = new FSlateImageBrush(FPaths::ProjectPluginsDir() + "FastInput/Resources/Wings", IconSize);
 		Set("FastInputEditorStyle.FastInputIcon", IconBrush);
 	}
 
