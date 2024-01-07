@@ -19,7 +19,7 @@ public:
 	void AddToolbarExtension(FToolBarBuilder& Builder);
 	UObject* FastInputManager;
 	void MyButtonClicked() {
-		UFastInputManager::GetCppInstance()->SpawnEditorWidgetWindow();
+		UFastInputManager::GetCppInstance()->RunEditorWidgetWindow();
 	}
 	
 };

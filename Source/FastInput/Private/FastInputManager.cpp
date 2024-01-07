@@ -165,47 +165,18 @@ void UFastInputManager::UpdateCustomSelections_Implementation()
 {
 }
 
-const FName EditorWidgetTabId = FName(TEXT("FastInputEditorWindow"));
-
-TSharedRef<SDockTab> SpawnEditorWidgetTab(const FSpawnTabArgs& Args, UEditorUtilityWidgetBlueprint* WidgetBlueprint)
-{
-	check(Args.GetTabId() == EditorWidgetTabId);
-	// Create the widget instance and wrap it in a TSharedRef.
-	TSharedRef<SWidget> EditorWidget = WidgetBlueprint->CreateUtilityWidget();
-
-	// Create a new SDockTab and set its content to the EditorWidget.
-	return SNew(SDockTab)
-		.TabRole(ETabRole::PanelTab)
-		[
-			EditorWidget
-		];
-}
-
-
-void UFastInputManager::SpawnEditorWidgetWindow()
+void UFastInputManager::RunEditorWidgetWindow()
 {
 	FStringAssetReference WidgetAssetPath(TEXT("/FastInput/EUW_FastInput.EUW_FastInput"));
-	UEditorUtilityWidgetBlueprint* WidgetBlueprint = Cast<UEditorUtilityWidgetBlueprint>(WidgetAssetPath.TryLoad());
-    if (!WidgetBlueprint) return;
+	UEditorUtilityWidgetBlueprint* EditorUtilityBlueprint = Cast<UEditorUtilityWidgetBlueprint>(WidgetAssetPath.TryLoad());
+	// Get the Editor Utility Subsystem
+	UEditorUtilitySubsystem* EditorUtilitySubsystem = GEditor->GetEditorSubsystem<UEditorUtilitySubsystem>();
 
-    // Get the Level Editor's TabManager from the LevelEditor module.
-    TSharedPtr<FTabManager> LevelEditorTabManager = FModuleManager::LoadModuleChecked<FLevelEditorModule>("LevelEditor").GetLevelEditorTabManager();
-
-    if (LevelEditorTabManager->HasTabSpawner(EditorWidgetTabId))
-    {
-        // If the tab spawner is already registered, invoke the existing tab.
-        LevelEditorTabManager->TryInvokeTab(EditorWidgetTabId);
-    }
-    else
-    {
-        // Otherwise, register the tab spawner.
-        LevelEditorTabManager->RegisterTabSpawner(EditorWidgetTabId, FOnSpawnTab::CreateStatic(&SpawnEditorWidgetTab, WidgetBlueprint))
-            .SetDisplayName(FText::FromString(TEXT("")))
-            .SetTooltipText(FText::FromString(TEXT("")));
-
-        // Invoke the newly registered tab.
-        LevelEditorTabManager->TryInvokeTab(EditorWidgetTabId);
-    }
+	if (EditorUtilityBlueprint)
+	{
+		// Run the Editor Utility Blueprint
+		EditorUtilitySubsystem->SpawnAndRegisterTab(EditorUtilityBlueprint);
+	}
 }
 
 void UFastInputManager::TriggerEUWEvent(FString EventName)
@@ -311,11 +282,15 @@ void UFastInputManager::FIReadJson()
 		}
 		else
 		{
+			this->Selections.Empty();
+			this->CustomSelections.Empty();
 			UE_LOG(LogTemp, Error, TEXT("Failed to parse JSON file: %s"), *FilePath);
 		}
 	}
 	else
 	{
+		this->Selections.Empty();
+		this->CustomSelections.Empty();
 		UE_LOG(LogTemp, Error, TEXT("Failed to load JSON file: %s"), *FilePath);
 	}
 }

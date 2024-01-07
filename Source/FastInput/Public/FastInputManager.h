@@ -14,6 +14,7 @@
 #include "Editor.h"
 #include "InputCoreTypes.h"
 #include "LevelEditor.h"
+#include "EditorUtilitySubsystem.h"
 #include "FastInputManager.generated.h"
 
 UCLASS(Blueprintable)
@@ -53,7 +54,7 @@ public:
 	void UpdateCustomSelections();
 public:
 	// 触发FI界面事件
-	void SpawnEditorWidgetWindow();
+	void RunEditorWidgetWindow();
 	UFUNCTION(BlueprintCallable)
 	void TriggerEUWEvent(FString EventName);
 public:
