@@ -19,7 +19,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	static UFastInputManager* Get();
+	static UFastInputManager* GetCppInstance();
 
 public:
 	// 有关鼠标点击
@@ -59,7 +59,9 @@ private:
 	TSharedPtr<FJsonObject> FIMakeJson();
 
 public:
-	static UFastInputManager* self;
+	static UFastInputManager* FastInputManagerCppInstance;
+	static UObject* FastInputManagerBPInstance;
+
 	TSharedPtr<SEditableText> EditableTextSharedPtr;
 	FProperty* PropertyPtr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FastInput")

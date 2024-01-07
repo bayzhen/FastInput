@@ -5,16 +5,17 @@
 #include "Editor.h"
 #include "InputCoreTypes.h"
 
-UFastInputManager* UFastInputManager::self = nullptr;
+UFastInputManager* UFastInputManager::FastInputManagerCppInstance = nullptr;
+UObject* UFastInputManager::FastInputManagerBPInstance = nullptr;
 
 UFastInputManager::UFastInputManager()
 {
 	EditableTextSharedPtr = nullptr;
 }
 
-UFastInputManager* UFastInputManager::Get()
+UFastInputManager* UFastInputManager::GetCppInstance()
 {
-	return self;
+	return FastInputManagerCppInstance;
 }
 
 void UFastInputManager::GetSDetailSingleItemRow(FSlateApplication& SlateApp, TSharedPtr<SDetailSingleItemRow>& OutDetailSingleItemRow)

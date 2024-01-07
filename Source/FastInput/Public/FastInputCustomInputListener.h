@@ -49,7 +49,7 @@ public:
 
 	virtual bool HandleMouseButtonUpEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) { 
 		UE_LOG(LogTemp, Warning, TEXT("markov HandleMouseButtonUpEvent"));
-		UFastInputManager* FastInputSubsystem = UFastInputManager::Get();
+		UFastInputManager* FastInputSubsystem = UFastInputManager::GetCppInstance();
 		TSharedPtr<SDetailSingleItemRow> DetailSingleItemRowPtr;
 		FastInputSubsystem->GetSDetailSingleItemRow(SlateApp, DetailSingleItemRowPtr);
 		FastInputSubsystem->GetAllPropertiesNameAndClass(DetailSingleItemRowPtr);
