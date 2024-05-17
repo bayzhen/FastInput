@@ -54,7 +54,7 @@ void UFastInputManager::GetAllPropertiesNameAndClass(TSharedPtr<SDetailSingleIte
 		return;
 	}
 
-	TArray<TSharedPtr<IPropertyHandle>> PropertyHandlePtrArray = InDetailSingleItemRowPtr->GetPropertyHandles();
+	TArray<TSharedPtr<IPropertyHandle>> PropertyHandlePtrArray = InDetailSingleItemRowPtr->WidgetRow.GetPropertyHandles();
 
 	/*for (auto& PropertyHandlePtr : PropertyHandlePtrArray) {
 		FProperty* Property = PropertyHandlePtr->GetProperty();
